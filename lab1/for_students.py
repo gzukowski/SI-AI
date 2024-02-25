@@ -1,10 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from numpy.linalg import inv
 
-from data import get_data, inspect_data, split_data
+from data import get_data, inspect_data, split_data, linear_function
 
 data = get_data()
-inspect_data(data)
+#inspect_data(data)
 
 train_data, test_data = split_data(data)
 
@@ -19,18 +20,45 @@ train_data, test_data = split_data(data)
 y_train = train_data['MPG'].to_numpy()
 x_train = train_data['Weight'].to_numpy()
 
+
 y_test = test_data['MPG'].to_numpy()
 x_test = test_data['Weight'].to_numpy()
 
+
+
 # TODO: calculate closed-form solution
-theta_best = [0, 0]
+#theta_best = [0, 0]
+
+x_train_col = x_train.reshape(-1, 1)
+y_train_col = y_train.reshape(-1, 1)
+ones_col = np.ones((len(x_train), 1)) # ilosc rzedow x dlugosc rzedu
+observation_matrix = np.concatenate((ones_col, x_train_col), axis=1) # macierz obserwacji z jednej cechy
+
+step_one = np.matmul(observation_matrix.T, observation_matrix)   #X^t * X
+
+step_two = np.dot(inv(step_one), observation_matrix.T)  #(X^t * X)^-1  * X^t
+
+vector_theta = np.dot(step_two, y_train_col)
+
+theta_best = vector_theta.flatten()
+
+print(theta_best)
+
+
 
 # TODO: calculate error
+
+
+y_train_predict = observation_matrix.dot(theta_best)
+mse_train = np.mean((y_train_predict - y_train) ** 2)
+
+print(mse_train)
+
 
 # plot the regression line
 x = np.linspace(min(x_test), max(x_test), 100)
 y = float(theta_best[0]) + float(theta_best[1]) * x
-plt.plot(x, y)
+plt.plot(x, y, color='red')
 plt.scatter(x_test, y_test)
 plt.xlabel('Weight')
 plt.ylabel('MPG')
@@ -45,7 +73,7 @@ plt.show()
 # plot the regression line
 x = np.linspace(min(x_test), max(x_test), 100)
 y = float(theta_best[0]) + float(theta_best[1]) * x
-plt.plot(x, y)
+plt.plot(x, y, color='red')
 plt.scatter(x_test, y_test)
 plt.xlabel('Weight')
 plt.ylabel('MPG')
