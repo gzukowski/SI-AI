@@ -66,6 +66,19 @@ plt.show()
 
 # TODO: standardization
 
+x_train_mean = np.mean(x_train)
+x_train_std = np.std(x_train)
+
+x_train_standardized = (x_train - x_train_mean) / x_train_std
+x_test_standardized = (x_test - x_train_mean) / x_train_std
+
+ones_col_standarized = np.ones((len(x_train_standardized), 1)) # ilosc rzedow x dlugosc rzedu
+bias = np.concatenate((ones_col, x_train_col), axis=1) # macierz obserwacji z jednej cechy
+
+print(bias)
+
+
+
 # TODO: calculate theta using Batch Gradient Descent
 
 # TODO: calculate error
