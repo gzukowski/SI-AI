@@ -81,6 +81,19 @@ print(bias)
 
 # TODO: calculate theta using Batch Gradient Descent
 
+learning_rate = 0.1
+iterations = 400
+theta_best = np.random.rand(2,1) # wartosci theta z przedzialu 0, 1
+
+print(theta_best)
+for iteration in range(iterations):
+      gradient = 2/len(x_train_col) * observation_matrix.T.dot(observation_matrix.dot(theta_best) - y_train_col)
+      theta_best = theta_best - learning_rate * gradient
+      print(theta_best)
+      #print("d")
+
+
+print(theta_best)
 # TODO: calculate error
 
 # plot the regression line
