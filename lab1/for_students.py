@@ -48,11 +48,22 @@ print(theta_best)
 
 # TODO: calculate error
 
+x_test_col = x_test.reshape(-1, 1)
+ones_col_test = np.ones((len(x_test_col), 1))
+observation_matrix_test = np.concatenate((ones_col_test, x_test_col), axis=1)
+
+y_test_predict = observation_matrix_test.dot(theta_best)
+
+
 
 y_train_predict = observation_matrix.dot(theta_best)
 mse_train = np.mean((y_train_predict - y_train) ** 2)
+mse_test = np.mean((y_test_predict - y_test) ** 2)
 
-print(mse_train)
+print(f"mse train: {mse_train}")
+print(f"mse test: {mse_test}")
+
+#print(mse_train)
 
 
 # plot the regression line
@@ -69,38 +80,67 @@ plt.show()
 x_train_mean = np.mean(x_train)
 x_train_std = np.std(x_train)
 
+y_train_mean = np.mean(y_train)
+y_train_std = np.std(y_train)
+
 x_train_standardized = (x_train - x_train_mean) / x_train_std
 x_test_standardized = (x_test - x_train_mean) / x_train_std
 
-ones_col_standarized = np.ones((len(x_train_standardized), 1)) # ilosc rzedow x dlugosc rzedu
-bias = np.concatenate((ones_col, x_train_col), axis=1) # macierz obserwacji z jednej cechy
+y_train_standardized = (y_train - y_train_mean) / y_train_std
+y_test_standardized = (y_test - y_train_mean) / y_train_std
 
-print(bias)
+
+
+ones_col_standarized = np.ones((len(x_train_standardized), 1)) # ilosc rzedow x dlugosc rzedu
+
+
+x_train_standardized = x_train_standardized.reshape(-1, 1)
+y_train_standardized = y_train_standardized.reshape(-1, 1)
+
+observation_matrix_standarized = np.concatenate((ones_col_standarized, x_train_standardized), axis=1) # macierz obserwacji z jednej cechy
+
+#print(observation_matrix_standarized)
 
 
 
 # TODO: calculate theta using Batch Gradient Descent
 
-learning_rate = 0.1
-iterations = 400
+LEARNING_RATE = 0.01
+ITERATIONS = 1000
 theta_best = np.random.rand(2,1) # wartosci theta z przedzialu 0, 1
 
-print(theta_best)
-for iteration in range(iterations):
-      gradient = 2/len(x_train_col) * observation_matrix.T.dot(observation_matrix.dot(theta_best) - y_train_col)
-      theta_best = theta_best - learning_rate * gradient
-      print(theta_best)
-      #print("d")
+print(f"random init thetas {theta_best.flatten()}")
+for iteration in range(ITERATIONS):
+      gradient = 2/len(x_train_col) * observation_matrix_standarized.T.dot(observation_matrix_standarized.dot(theta_best) - y_train_standardized)
+      theta_best = theta_best - LEARNING_RATE * gradient
 
 
-print(theta_best)
+theta_best = theta_best.flatten()
+print(f"found thetas {theta_best}")
 # TODO: calculate error
 
+
+
+x_test_standardized = x_test_standardized.reshape(-1, 1)
+ones_col_test = np.ones((len(x_test_standardized), 1))
+
+
+observation_matrix_standarized_test = np.concatenate((ones_col_test, x_test_standardized), axis=1)
+
+y_train_predict = observation_matrix_standarized.dot(theta_best)
+y_test_predict = observation_matrix_standarized_test.dot(theta_best)
+
+mse_train = np.mean((y_train_predict - y_train_standardized) ** 2)
+mse_test = np.mean((y_test_predict - y_test_standardized) ** 2)
+
+print(mse_train, mse_test)
+
+
 # plot the regression line
-x = np.linspace(min(x_test), max(x_test), 100)
+x = np.linspace(min(x_test_standardized), max(x_test_standardized), 100)
 y = float(theta_best[0]) + float(theta_best[1]) * x
 plt.plot(x, y, color='red')
-plt.scatter(x_test, y_test)
+plt.scatter(x_test_standardized, y_test_standardized)
 plt.xlabel('Weight')
 plt.ylabel('MPG')
 plt.show()
