@@ -117,9 +117,10 @@ for iteration in range(ITERATIONS):
 
 theta_best = theta_best.flatten()
 print(f"found thetas {theta_best}")
+
+
+
 # TODO: calculate error
-
-
 
 x_test_standardized = x_test_standardized.reshape(-1, 1)
 ones_col_test = np.ones((len(x_test_standardized), 1))

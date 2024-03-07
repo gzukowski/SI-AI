@@ -37,7 +37,3 @@ def split_data(dataset):
     test_dataset = dataset.drop(train_dataset.index)
 
     return train_dataset, test_dataset
-
-
-def linear_function(a, b, x):
-    return a*x +b
