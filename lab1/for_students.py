@@ -58,24 +58,24 @@ y_test_predict = observation_matrix_test.dot(theta_best)
 
 mse_test = np.mean((y_test_predict - y_test) ** 2)
 
-#y_train_predict = observation_matrix.dot(theta_best)
-#mse_train = np.mean((y_train_predict - y_train) ** 2)
+y_train_predict = observation_matrix.dot(theta_best)
+mse_train = np.mean((y_train_predict - y_train) ** 2)
 
 
-#print(f"mse train: {mse_train}")
+print(f"mse train: {mse_train}")
 print(f"mse test: {mse_test}")
 
 #print(mse_train)
 
 
 # plot the regression line
-x = np.linspace(min(x_test), max(x_test), 100)
-y = float(theta_best[0]) + float(theta_best[1]) * x
-plt.plot(x, y, color='red')
-plt.scatter(x_test, y_test)
-plt.xlabel('Weight')
-plt.ylabel('MPG')
-plt.show()
+# x = np.linspace(min(x_test), max(x_test), 100)
+# y = float(theta_best[0]) + float(theta_best[1]) * x
+# plt.plot(x, y, color='red')
+# plt.scatter(x_test, y_test)
+# plt.xlabel('Weight')
+# plt.ylabel('MPG')
+# plt.show()
 
 # TODO: standardization
 
@@ -105,8 +105,8 @@ observation_matrix_standarized = np.concatenate((ones_col_standarized, x_train_s
 
 # TODO: calculate theta using Batch Gradient Descent
 
-LEARNING_RATE = 0.01
-ITERATIONS = 1000
+LEARNING_RATE = 0.001
+ITERATIONS = 15000
 theta_best = np.random.rand(2,1) # wartosci theta z przedzialu 0, 1
 
 
@@ -116,8 +116,7 @@ for iteration in range(ITERATIONS):
       theta_best = theta_best - LEARNING_RATE * gradient
 
 
-theta_best = theta_best.flatten()
-print(f"found thetas {theta_best}")
+print(f"found thetas {theta_best.flatten()}")
 
 
 
@@ -129,14 +128,25 @@ ones_col_test = np.ones((len(x_test_standardized), 1))
 
 observation_matrix_standarized_test = np.concatenate((ones_col_test, x_test_standardized), axis=1)
 
-y_train_predict = observation_matrix_standarized.dot(theta_best)
-y_test_predict = observation_matrix_standarized_test.dot(theta_best)
+
+#x_train_standardized = x_train_standardized.reshape(-1)
+
+
+print(theta_best.reshape(-1,1))
+
+print(theta_best.flatten())
+y_train_predict = x_train_standardized.dot(theta_best.reshape(1,2)) # bez jedynki lol  reshape(1, 2)
+
+print(x_test_standardized)
+
+y_test_predict = x_test_standardized.dot(theta_best.reshape(1,2))
 
 mse_train = np.mean((y_train_predict - y_train_standardized) ** 2)
+print(f"mse train: {mse_train}")
 mse_test = np.mean((y_test_predict - y_test_standardized) ** 2)
 
 
-#print(f"mse train: {mse_train}")
+print(f"mse train: {mse_train}")
 print(f"mse test: {mse_test}")
 
 
