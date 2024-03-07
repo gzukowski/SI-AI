@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from numpy.linalg import inv
 
-from data import get_data, inspect_data, split_data, linear_function
+from data import get_data, inspect_data, split_data
 
 data = get_data()
 #inspect_data(data)
@@ -27,7 +27,9 @@ x_test = test_data['Weight'].to_numpy()
 
 
 # TODO: calculate closed-form solution
-#theta_best = [0, 0]
+
+
+theta_best = [0, 0]
 
 x_train_col = x_train.reshape(-1, 1)
 y_train_col = y_train.reshape(-1, 1)
@@ -42,25 +44,25 @@ vector_theta = np.dot(step_two, y_train_col)
 
 theta_best = vector_theta.flatten()
 
+
 print(theta_best)
 
 
 
 # TODO: calculate error
-
 x_test_col = x_test.reshape(-1, 1)
 ones_col_test = np.ones((len(x_test_col), 1))
 observation_matrix_test = np.concatenate((ones_col_test, x_test_col), axis=1)
 
 y_test_predict = observation_matrix_test.dot(theta_best)
 
-
-
-y_train_predict = observation_matrix.dot(theta_best)
-mse_train = np.mean((y_train_predict - y_train) ** 2)
 mse_test = np.mean((y_test_predict - y_test) ** 2)
 
-print(f"mse train: {mse_train}")
+#y_train_predict = observation_matrix.dot(theta_best)
+#mse_train = np.mean((y_train_predict - y_train) ** 2)
+
+
+#print(f"mse train: {mse_train}")
 print(f"mse test: {mse_test}")
 
 #print(mse_train)
@@ -99,8 +101,6 @@ y_train_standardized = y_train_standardized.reshape(-1, 1)
 
 observation_matrix_standarized = np.concatenate((ones_col_standarized, x_train_standardized), axis=1) # macierz obserwacji z jednej cechy
 
-#print(observation_matrix_standarized)
-
 
 
 # TODO: calculate theta using Batch Gradient Descent
@@ -108,6 +108,7 @@ observation_matrix_standarized = np.concatenate((ones_col_standarized, x_train_s
 LEARNING_RATE = 0.01
 ITERATIONS = 1000
 theta_best = np.random.rand(2,1) # wartosci theta z przedzialu 0, 1
+
 
 print(f"random init thetas {theta_best.flatten()}")
 for iteration in range(ITERATIONS):
@@ -134,7 +135,9 @@ y_test_predict = observation_matrix_standarized_test.dot(theta_best)
 mse_train = np.mean((y_train_predict - y_train_standardized) ** 2)
 mse_test = np.mean((y_test_predict - y_test_standardized) ** 2)
 
-print(mse_train, mse_test)
+
+#print(f"mse train: {mse_train}")
+print(f"mse test: {mse_test}")
 
 
 # plot the regression line
