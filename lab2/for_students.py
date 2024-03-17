@@ -73,12 +73,17 @@ def roulette_wheel_selection(items, knapsack_max_capacity, population, selection
 def mutation(population, mutation_rate):
     mutated_population = []
     for individual in population:
-        mutated_individual = []
-        for gene in individual:
-            if random.random() < mutation_rate:
-                mutated_individual.append(1 - gene)
-            else:
-                mutated_individual.append(gene)
+        mutated_individual = individual.copy()
+
+        index = random.randint(0, len(individual)-1)
+
+        mutated_individual[index] = 1 - mutated_individual[index]
+
+        #for gene in individual:
+            # if random.random() < mutation_rate:
+            #     mutated_individual.append(1 - gene)
+            # else:
+            #     mutated_individual.append(gene)
         mutated_population.append(mutated_individual)
     return mutated_population
 
