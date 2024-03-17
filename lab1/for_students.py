@@ -120,7 +120,6 @@ theta_best = theta_best.flatten()
 print(f"found thetas {theta_best}")
 
 
-
 # TODO: calculate error
 
 x_test_standardized = x_test_standardized.reshape(-1, 1)
