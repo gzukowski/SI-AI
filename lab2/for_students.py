@@ -15,7 +15,7 @@ from data import *
 POPULATION_SIZE = 100
 GENERATIONS = 200
 N_SELECTION = 40
-N_ELITE = 10
+N_ELITE = 6
 
 
 items, knapsack_max_capacity = get_big()
