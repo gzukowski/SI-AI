@@ -7,6 +7,9 @@ TIE = 0
 CONTINUE = -999
 INIT_DEPTH = 2
 
+PLUS_INF = 999
+MIN_INF = -999
+
 X = 1
 O = 0
 
@@ -29,7 +32,7 @@ class AlfaBetaAgent:
         state = game_instance.board
 
         actions = self.possible_drops(game_instance.board)
-        self.logger.info(f"decider: {actions}")
+        #self.logger.info(f"decider: {actions}")
         generated_states = [copy.deepcopy(game_instance.board) for possiblity in actions]
 
         x = 1
@@ -43,17 +46,21 @@ class AlfaBetaAgent:
             self.drop_token(state, actions[index], x)
 
         results = []
+
+        alfa = PLUS_INF
+        beta = MIN_INF
+
         for state in generated_states:
             
             if state == None:
                 results.append(None)
                 continue
 
-            result = self.min_max_tree(state, 0, INIT_DEPTH)
+            result = self.min_max_tree(state, 0, alfa, beta, INIT_DEPTH)
             results.append(result)
 
 
-        self.logger.info(f"res: {results}")
+        #self.logger.info(f"res: {results}")
 
         max_value = max(item for item in results if item is not None)
 
@@ -129,7 +136,7 @@ class AlfaBetaAgent:
             board_state[n_row][n_column] = 'o'
 
     
-    def min_max_tree(self, board_state, x, depth = 2):
+    def min_max_tree(self, board_state, x, alfa, beta, depth = 2):
 
         finish = self._check_game_over(board_state) # checking the state of the game
 
@@ -144,7 +151,7 @@ class AlfaBetaAgent:
             # for row in board_state:
             #     print(row)
                 
-            self.logger.info(f"possible: {actions}")
+            #self.logger.info(f"possible: {actions}")
             generated_states = [copy.deepcopy(board_state) for possiblity in actions]
 
             for index, state in enumerate(generated_states):
@@ -153,13 +160,28 @@ class AlfaBetaAgent:
             if x == 0:
 
                 results = []
+                v = PLUS_INF
+                cut_off = False
+
                 for index, board in enumerate(generated_states):
+
+                    if cut_off:
+                        results.append(None)
+                        continue
 
                     if actions[index] == None:
                         results.append(None)
                         continue
+                    
+                    result = self.min_max_tree(board, 1, alfa, beta, depth - 1)
 
-                    result = self.min_max_tree(board, 1, depth - 1)
+                    v = min(v, result)
+                    beta = min(beta, v)
+
+                    if v <= alfa:
+                        cut_off = True
+                        self.logger.info("Cut off")
+
                     results.append(result)
                 
                 return min(item for item in results if item is not None)
@@ -167,13 +189,28 @@ class AlfaBetaAgent:
             if x == 1:
 
                 results = []
+                v = MIN_INF
+                cut_off = False
+            
                 for index, board in enumerate(generated_states):
+
+                    if cut_off:
+                        results.append(None)
+                        continue
 
                     if actions[index] == None:
                         results.append(None)
                         continue
 
-                    result = self.min_max_tree(board, 0, depth - 1)
+                    result = self.min_max_tree(board, 0, alfa, beta, depth - 1)
+
+                    v = max(v, result)
+                    alfa = max(alfa, v)
+
+                    if v >= beta:
+                        self.logger.info("Cut off")
+                        cut_off = True
+
                     results.append(result)
                 
                 return max(item for item in results if item is not None)
@@ -205,5 +242,7 @@ class AlfaBetaAgent:
         fh = logging.FileHandler('spam.log')
         fh.setLevel(logging.DEBUG)
         self.logger.addHandler(fh)
+
+    
 
 
