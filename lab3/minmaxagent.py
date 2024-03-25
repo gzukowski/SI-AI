@@ -30,22 +30,31 @@ class MinMaxAgent:
 
         actions = self.possible_drops(game_instance.board)
         self.logger.info(f"decider: {actions}")
-        generated_states = [copy.deepcopy(game_instance.board)for possiblity in actions]
+        generated_states = [copy.deepcopy(game_instance.board) for possiblity in actions]
 
         x = 1
 
         for index, state in enumerate(generated_states):
-            print("looop")
+            
+            if actions[index] == None:
+                generated_states[index] = None
+                continue
+
             self.drop_token(state, actions[index], x)
 
         results = []
         for state in generated_states:
+            
+            if state == None:
+                results.append(None)
+                continue
+
             result = self.min_max_tree(state, 0, INIT_DEPTH)
             results.append(result)
 
-        self.logger.info(str(results))
+        self.logger.info(f"res: {results}")
 
-        decision = results.index(max(results))
+        decision = results.index(max(item for item in results if item is not None))
         return decision
 
 
@@ -121,9 +130,9 @@ class MinMaxAgent:
         if finish == CONTINUE:
             actions = self.possible_drops(board_state)
 
-            print("mapa:")
-            for row in board_state:
-                print(row)
+            # print("mapa:")
+            # for row in board_state:
+            #     print(row)
                 
             self.logger.info(f"mozliwe: {actions}")
             generated_states = [copy.deepcopy(board_state) for possiblity in actions]
@@ -141,19 +150,33 @@ class MinMaxAgent:
 
                 results = []
                 for index, board in enumerate(generated_states):
+
+                    if actions[index] == None:
+                        results.append(None)
+                        continue
+
                     result = self.min_max_tree(board, 1, depth - 1)
                     results.append(result)
+                
 
-                return min(results)
+                print(results)
+                return min(item for item in results if item is not None)
             
             if x == 1:
 
                 results = []
                 for index, board in enumerate(generated_states):
+
+                    if actions[index] == None:
+                        results.append(None)
+                        continue
+
                     result = self.min_max_tree(board, 0, depth - 1)
                     results.append(result)
                 
-                return max(results)
+                print(results)
+                return max(item for item in results if item is not None)
+
 
 
 
