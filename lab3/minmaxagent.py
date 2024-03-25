@@ -1,12 +1,16 @@
 import copy
+import logging
 
 WIN = 1
 LOSE = -1
 TIE = 0
 CONTINUE = -999
+INIT_DEPTH = 2
 
 X = 1
 O = 0
+
+
 
 
 class MinMaxAgent:
@@ -15,32 +19,31 @@ class MinMaxAgent:
         self.my_token = my_token
         self.height = None
         self.width = None
+        self.init_logger()
     
 
     def decide(self, game_instance):
         self.height = game_instance.height
         self.width = game_instance.width
 
-        
         state = game_instance.board
 
-
         actions = self.possible_drops(game_instance.board)
+        self.logger.info(f"decider: {actions}")
         generated_states = [copy.deepcopy(game_instance.board)for possiblity in actions]
 
-
-        x = 0
+        x = 1
 
         for index, state in enumerate(generated_states):
+            print("looop")
             self.drop_token(state, actions[index], x)
 
-        
         results = []
         for state in generated_states:
-            result = self.min_max_tree(state,x, 2)
+            result = self.min_max_tree(state, 0, INIT_DEPTH)
             results.append(result)
 
-        print(results)
+        self.logger.info(str(results))
 
         decision = results.index(max(results))
         return decision
@@ -67,37 +70,34 @@ class MinMaxAgent:
 
     def _check_game_over(self, board_state):
         if not self.possible_drops(board_state):
-            #self.wins = None  # tie
             return TIE   # Tie
 
         for four in self.iter_fours(board_state):
-
             if self.my_token == 'o':
                 if four == ['o', 'o', 'o', 'o']:
-                    #elf.wins = 'o'
                     return WIN
                 elif four == ['x', 'x', 'x', 'x']:
-                    #self.wins = 'x'
                     return LOSE
                 
             
             elif self.my_token == 'x':
                     if four == ['o', 'o', 'o', 'o']:
-                        #elf.wins = 'o'
                         return LOSE
                     elif four == ['x', 'x', 'x', 'x']:
-                        #self.wins = 'x'
                         return WIN
 
         return CONTINUE
 
 
     def possible_drops(self, board_state):
-        return [n_column for n_column in range(self.width) if board_state[0][n_column] == '_']
+        return [n_column if board_state[0][n_column] == '_' else None for n_column in range(self.width)]
     
     
     def drop_token(self, board_state, n_column, x):
 
+        if n_column == None:
+            return
+        
         n_row = 0
         while n_row + 1 < self.height and board_state[n_row+1][n_column] == '_':
             n_row += 1
@@ -112,8 +112,7 @@ class MinMaxAgent:
 
     def min_max_tree(self, board_state, x, depth = 2):
 
-
-        finish = self._check_game_over(board_state)
+        finish = self._check_game_over(board_state) # checking the state of the game
 
 
         if depth == 0:
@@ -121,31 +120,40 @@ class MinMaxAgent:
 
         if finish == CONTINUE:
             actions = self.possible_drops(board_state)
-            generated_states = [copy.deepcopy(board_state)for possiblity in actions]
+
+            print("mapa:")
+            for row in board_state:
+                print(row)
+                
+            self.logger.info(f"mozliwe: {actions}")
+            generated_states = [copy.deepcopy(board_state) for possiblity in actions]
 
             for index, state in enumerate(generated_states):
                 self.drop_token(state, actions[index], x)
 
-            
-
+        
             # for b in generated_states:
             #     for row in b:
             #         print(row)
 
+    
+            if x == 0:
 
-            results = []
-            for index, board in enumerate(generated_states):
-                result = self.min_max_tree(board, x, depth - 1)
-                results.append(result)
-                
-            #results = [self.min_max_tree(board_copy, x, depth-1) for ]
-            if x == O: # best option for player
-        
-                return max(results)
-            
-            if x == X: # worst option for opponent
-                
+                results = []
+                for index, board in enumerate(generated_states):
+                    result = self.min_max_tree(board, 1, depth - 1)
+                    results.append(result)
+
                 return min(results)
+            
+            if x == 1:
+
+                results = []
+                for index, board in enumerate(generated_states):
+                    result = self.min_max_tree(board, 0, depth - 1)
+                    results.append(result)
+                
+                return max(results)
 
 
 
@@ -153,10 +161,11 @@ class MinMaxAgent:
         return finish # finish 
 
         
-
-
-
-        pass
-
+    def init_logger(self):
+        self.logger = logging.getLogger('spam_application')
+        self.logger.setLevel(logging.DEBUG)
+        fh = logging.FileHandler('spam.log')
+        fh.setLevel(logging.DEBUG)
+        self.logger.addHandler(fh)
 
 
