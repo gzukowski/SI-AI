@@ -134,17 +134,11 @@ class MinMaxAgent:
             # for row in board_state:
             #     print(row)
                 
-            self.logger.info(f"mozliwe: {actions}")
+            self.logger.info(f"possible: {actions}")
             generated_states = [copy.deepcopy(board_state) for possiblity in actions]
 
             for index, state in enumerate(generated_states):
                 self.drop_token(state, actions[index], x)
-
-        
-            # for b in generated_states:
-            #     for row in b:
-            #         print(row)
-
     
             if x == 0:
 
@@ -158,8 +152,6 @@ class MinMaxAgent:
                     result = self.min_max_tree(board, 1, depth - 1)
                     results.append(result)
                 
-
-                print(results)
                 return min(item for item in results if item is not None)
             
             if x == 1:
@@ -174,7 +166,6 @@ class MinMaxAgent:
                     result = self.min_max_tree(board, 0, depth - 1)
                     results.append(result)
                 
-                print(results)
                 return max(item for item in results if item is not None)
 
 
