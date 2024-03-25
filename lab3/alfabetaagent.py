@@ -13,7 +13,7 @@ O = 0
 
 
 
-class MinMaxAgent:
+class AlfaBetaAgent:
 
     def __init__(self, my_token='x'):
         self.my_token = my_token
