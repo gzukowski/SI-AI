@@ -10,8 +10,8 @@ agent2  = AlfaBetaAgent('x')
 while not connect4.game_over:
     connect4.draw()
     try:
-        if connect4.who_moves == agent2.my_token:
-            n_column = agent2.decide(connect4)
+        if connect4.who_moves == agent.my_token:
+            n_column = agent.decide(connect4)
         else:
             n_column = int(input(':'))
         connect4.drop_token(n_column)

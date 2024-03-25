@@ -129,7 +129,7 @@ class MinMaxAgent:
             board_state[n_row][n_column] = 'o'
 
     
-    def min_max_tree(self, board_state, x, depth = 2):
+    def min_max_tree(self, board_state, x, depth = 5):
 
         finish = self._check_game_over(board_state) # checking the state of the game
 
