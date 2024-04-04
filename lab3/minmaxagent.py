@@ -1,11 +1,12 @@
 import copy
 import logging
+import time
 
 WIN = 1
 LOSE = -1
 TIE = 0
 CONTINUE = -999
-INIT_DEPTH = 2
+INIT_DEPTH = 3
 
 X = 1
 O = 0
@@ -19,17 +20,21 @@ class MinMaxAgent:
         self.my_token = my_token
         self.height = None
         self.width = None
+        self.opponent = 'x' if self.my_token == 'o' else 'o'
+        print(self.opponent)
+        
         self.init_logger()
     
 
     def decide(self, game_instance):
+        start_time = time.time()
         self.height = game_instance.height
         self.width = game_instance.width
 
         state = game_instance.board
 
         actions = self.possible_drops(game_instance.board)
-        self.logger.info(f"decider: {actions}")
+        #self.logger.info(f"decider: {actions}")
         generated_states = [copy.deepcopy(game_instance.board) for possiblity in actions]
 
         x = 1
@@ -49,13 +54,15 @@ class MinMaxAgent:
                 results.append(None)
                 continue
 
-            result = self.min_max_tree(state, 0, INIT_DEPTH)
+            result = self.min_max_tree(state, 0, INIT_DEPTH) # jedynka
             results.append(result)
 
 
-        self.logger.info(f"res: {results}")
+        #self.logger.info(f"res: {results}")
 
         max_value = max(item for item in results if item is not None)
+
+        print(results)
 
         decision = results.index(max_value)
 
@@ -63,8 +70,12 @@ class MinMaxAgent:
         # 0 is the state value which isnt showing any win/lose condition
         # so agent should check if there is a possibilty to make the move at the center
 
-        if max_value == 0:
-            decision = self.cover_center(results, decision)
+        # if max_value == 0:
+        #     decision = self.cover_center(results, decision)
+
+        end_time = time.time()  # End time counter
+        elapsed_time = end_time - start_time
+        self.logger.info(f"Min max: {elapsed_time} seconds")
             
         return decision
 
@@ -122,11 +133,18 @@ class MinMaxAgent:
         while n_row + 1 < self.height and board_state[n_row+1][n_column] == '_':
             n_row += 1
 
-        if x == X:
-            board_state[n_row][n_column] = 'x'
+
+        if x == 1:
+            board_state[n_row][n_column] = self.my_token
         
-        if x == O:
-            board_state[n_row][n_column] = 'o'
+        if x == 0:
+            board_state[n_row][n_column] = self.opponent
+
+        # if x == X:
+        #     board_state[n_row][n_column] = 'x'
+        
+        # if x == O:
+        #     board_state[n_row][n_column] = 'o'
 
     
     def min_max_tree(self, board_state, x, depth = 5):
@@ -144,13 +162,13 @@ class MinMaxAgent:
             # for row in board_state:
             #     print(row)
                 
-            self.logger.info(f"possible: {actions}")
+            #self.logger.info(f"possible: {actions}")
             generated_states = [copy.deepcopy(board_state) for possiblity in actions]
 
             for index, state in enumerate(generated_states):
                 self.drop_token(state, actions[index], x)
     
-            if x == 0:
+            if x == 0: #0
 
                 results = []
                 for index, board in enumerate(generated_states):

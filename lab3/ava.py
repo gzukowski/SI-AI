@@ -3,10 +3,11 @@ from connect4 import Connect4
 from randomagent import RandomAgent
 from minmaxagent import MinMaxAgent
 from alfabetaagent import AlfaBetaAgent
+from alphabetaagent import AlphaBetaAgent
 
 connect4 = Connect4(width=7, height=6)
-agent1 = RandomAgent('o')
-agent2 = AlfaBetaAgent('x')
+agent1 = MinMaxAgent('x')
+agent2 = AlphaBetaAgent('o')
 while not connect4.game_over:
     connect4.draw()
     try:
