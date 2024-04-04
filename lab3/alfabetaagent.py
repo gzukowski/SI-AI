@@ -109,12 +109,16 @@ class AlfaBetaAgent:
                 elif four == ['x', 'x', 'x', 'x']:
                     return LOSE
                 
+
+                
             
             elif self.my_token == 'x':
                     if four == ['o', 'o', 'o', 'o']:
                         return LOSE
                     elif four == ['x', 'x', 'x', 'x']:
                         return WIN
+            
+
 
         return CONTINUE
 

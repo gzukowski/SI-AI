@@ -13,7 +13,7 @@ MIN_INF = -999
 
 
 
-class AlfaBetaAgent:
+class AlphaBetaAgent:
 
     def __init__(self, my_token='x'):
         self.my_token = my_token
@@ -102,21 +102,38 @@ class AlfaBetaAgent:
         if not self.possible_drops(board_state):
             return TIE   # Tie
 
-        for four in self.iter_fours(board_state):
-            if self.my_token == 'o':
-                if four == ['o', 'o', 'o', 'o']:
-                    return WIN
-                elif four == ['x', 'x', 'x', 'x']:
-                    return LOSE
-                
-            
-            elif self.my_token == 'x':
-                    if four == ['o', 'o', 'o', 'o']:
-                        return LOSE
-                    elif four == ['x', 'x', 'x', 'x']:
-                        return WIN
 
-        return CONTINUE
+        score = 0
+        coefficient = 1
+        for four in self.iter_fours(board_state):
+            if four.count(self.my_token) == 4:
+                return WIN
+            if four.count(self.opponent) == 4:
+                return LOSE
+            
+            elif four.count(self.my_token) == 3 and four.count("_") == 1:
+                    score += 0.8
+
+            elif four.count(self.my_token) == 2 and four.count("_") == 2:
+                    score += 0.45
+
+            elif four.count(self.my_token) == 0 and four.count("_") == 1:
+                    score -= 0.8
+
+            coefficient += 1
+
+        
+        center = self.center_column(board_state, self.width, self.height)
+
+        if center[0:4].count(self.my_token) + center[0:4].count("_") == 4:
+            score += 0.2
+
+        return score / coefficient
+
+
+
+    def center_column(self, state, width, height):
+        return [state[n_row][width//2] for n_row in range(height)]
 
 
     def possible_drops(self, board_state):
