@@ -66,13 +66,6 @@ class MinMaxAgent:
 
         decision = results.index(max_value)
 
-
-        # 0 is the state value which isnt showing any win/lose condition
-        # so agent should check if there is a possibilty to make the move at the center
-
-        # if max_value == 0:
-        #     decision = self.cover_center(results, decision)
-
         end_time = time.time()  # End time counter
         elapsed_time = end_time - start_time
         self.logger.info(f"Min max: {elapsed_time} seconds")
@@ -139,12 +132,6 @@ class MinMaxAgent:
         
         if x == 0:
             board_state[n_row][n_column] = self.opponent
-
-        # if x == X:
-        #     board_state[n_row][n_column] = 'x'
-        
-        # if x == O:
-        #     board_state[n_row][n_column] = 'o'
 
     
     def min_max_tree(self, board_state, x, depth = 5):

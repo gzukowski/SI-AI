@@ -5,7 +5,7 @@ class Connect4:
     def __init__(self, width=5, height=4):
         self.width = width
         self.height = height
-        self.who_moves = 'x'
+        self.who_moves = 'o'
         self.game_over = False
         self.wins = None
         self.board = []
@@ -71,3 +71,10 @@ class Connect4:
         else:
             print('now moves:', self.who_moves)
             print('possible drops:', self.possible_drops())
+
+    def is_Board_Empty(self):
+        for x in self.board:
+            for y in x:
+                if y != "_":
+                    return False
+        return True

@@ -8,12 +8,12 @@ TIE = 0
 
 
 CONTINUE = -999
-INIT_DEPTH = 6
+
 
 PLUS_INF = 999
 MIN_INF = -999
 
-class Agent:
+class MinMaxHeur:
       def __init__(self, my_token='x'):
             self.my_token = my_token
             self.height = None
@@ -44,16 +44,13 @@ class Agent:
 
             results = []
 
-            alfa = PLUS_INF
-            beta = MIN_INF
-
             for state in generated_states:
                   
                   if state == None:
                         results.append(None)
                         continue
 
-                  result = self.min_max_tree(state, 0, alfa, beta, INIT_DEPTH)
+                  result = self.min_max_tree(state, 0, 3)
                   results.append(result)
 
 
@@ -65,15 +62,13 @@ class Agent:
 
             end_time = time.time()  # End time counter
             elapsed_time = end_time - start_time
-            self.logger.info(f"Agent: {elapsed_time} seconds")
+            self.logger.info(f"MinMaxHeur: {elapsed_time} seconds")
                   
             return decision
       
-
       def evaluate_state(self, board_state):
             if not self.possible_drops(board_state):
                   return TIE   # Tie
-
 
             for four in self.iter_fours(board_state):
                   if four.count(self.my_token) == 4:
@@ -87,36 +82,32 @@ class Agent:
             score = 0
             coefficient = 1
             for four in self.iter_fours(board_state):
-                  # if four.count(self.my_token) == 4:
-                  #       score += 1
-                  # if four.count(self.opponent) == 4:
-                  #       return LOSE
-                  
                   if four.count(self.my_token) == 3 and four.count("_") == 1:
-                        score += 0.8
+                        score += 0.08
+
+                  elif four.count(self.opponent) == 3 and four.count("_") == 1:
+                        score -= 0.08
 
                   elif four.count(self.my_token) == 2 and four.count("_") == 2:
-                        score += 0.45
+                        score += 0.01
 
-                  elif four.count(self.my_token) == 0 and four.count("_") == 1:
-                        score -= 0.8
+                  elif four.count(self.opponent) == 2 and four.count("_") == 2:
+                        score -= 0.01
 
-                  coefficient += 1
 
-            
             center = self.center_column(board_state, self.width, self.height)
+            
+            center_ally_score = center.count(self.my_token) * 0.2
 
-            if center[0:4].count(self.my_token) + center[0:4].count("_") == 4:
-                  score += 0.2
-
-            return score / coefficient
+            #print(f"got {(center_ally_score + score) / coefficient}")
+            return (center_ally_score + score) #/ coefficient
       
 
       def center_column(self, state, width, height):
             return [state[n_row][width//2] for n_row in range(height)]
+      
 
-
-      def min_max_tree(self, board_state, x, alfa, beta, depth = 4):
+      def min_max_tree(self, board_state, x, depth = 4):
 
             finish = self.evaluate_state(board_state) # checking the state of the game
 
@@ -134,70 +125,40 @@ class Agent:
 
 
             if finish == CONTINUE:
-                  actions = self.possible_drops(board_state)
+                  if finish == CONTINUE:
+                    actions = self.possible_drops(board_state)
+                        
+                    #self.logger.info(f"possible: {actions}")
+                    generated_states = [copy.deepcopy(board_state) for possiblity in actions]
 
-
-                  #self.logger.info(f"possible: {actions}")
-                  generated_states = [copy.deepcopy(board_state) for possiblity in actions]
-
-                  for index, state in enumerate(generated_states):
+                    for index, state in enumerate(generated_states):
                         self.drop_token(state, actions[index], x)
-      
-                  if x == 0:
+            
+                    if x == 0: #0
 
                         results = []
-                        v = PLUS_INF
-                        cut_off = False
-
                         for index, board in enumerate(generated_states):
 
-                              if cut_off:
-                                    results.append(None)
-                                    continue
+                            if actions[index] == None:
+                                results.append(None)
+                                continue
 
-                              if actions[index] == None:
-                                    results.append(None)
-                                    continue
-                              
-                              result = self.min_max_tree(board, 1, alfa, beta, depth - 1)
-
-                              v = min(v, result)
-                              beta = min(beta, v)
-
-                              if v <= alfa:
-                                    cut_off = True
-                                    #self.logger.info("Cut off")
-
-                              results.append(result)
+                            result = self.min_max_tree(board, 1, depth - 1)
+                            results.append(result)
                         
                         return min(item for item in results if item is not None)
-                  
-                  if x == 1:
+                    
+                    if x == 1:
 
                         results = []
-                        v = MIN_INF
-                        cut_off = False
-                        
                         for index, board in enumerate(generated_states):
 
-                              if cut_off:
-                                    results.append(None)
-                                    continue
+                            if actions[index] == None:
+                                results.append(None)
+                                continue
 
-                              if actions[index] == None:
-                                    results.append(None)
-                                    continue
-
-                              result = self.min_max_tree(board, 0, alfa, beta, depth - 1)
-
-                              v = max(v, result)
-                              alfa = max(alfa, v)
-
-                              if v >= beta:
-                                    #self.logger.info("Cut off")
-                                    cut_off = True
-
-                              results.append(result)
+                            result = self.min_max_tree(board, 0, depth - 1)
+                            results.append(result)
                         
                         return max(item for item in results if item is not None)
 
