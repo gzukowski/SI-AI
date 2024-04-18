@@ -32,7 +32,7 @@ class RandomForest:
         # TODO implement bagging
 
         n_samples = X.shape[0]
-        indices = np.random.choice(n_samples, size=n_samples, replace=True)
+        indices = np.random.choice(n_samples, round(n_samples*0.63), replace=True)
         X_selected = X[indices]
         y_selected = y[indices]
 

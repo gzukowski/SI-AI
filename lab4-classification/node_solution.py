@@ -30,23 +30,53 @@ class Node:
         gini_gain = parent_gini - (left_weight * left_gini + right_weight * right_gini)
         return gini_gain
 
+    # def gini_best_score(self, y, possible_splits):
+    #     best_gain = -np.inf
+    #     best_idx = 0
+
+    #     # TODO find position of best data split
+
+    #     for idx in possible_splits:
+    #         y_left = y[:idx + 1]
+    #         y_right = y[idx + 1:]
+    #         gain = self.gini_gain(y, y_left, y_right)
+    #         if gain > best_gain:
+    #             best_gain = gain
+    #             best_idx = idx
+
+
+    #     return best_idx, best_gain
+
     def gini_best_score(self, y, possible_splits):
         best_gain = -np.inf
         best_idx = 0
 
-        # TODO find position of best data split
-
         for idx in possible_splits:
-            y_left = y[:idx + 1]
-            y_right = y[idx + 1:]
-            gain = self.gini_gain(y, y_left, y_right)
+            left_values = y[:idx + 1]
+            right_values = y[idx + 1:]
+
+            left = len(left_values)
+            right = len(right_values)
+
+            left_pos = np.sum(left_values)
+            left_neg = left - left_pos
+
+            right_pos = np.sum(right_values)
+            right_neg = right - right_pos
+
+            gini_left = 1 - (left_pos / left) ** 2 - (left_neg / left) ** 2
+            gini_right = 1 - (right_pos / right) ** 2 - \
+                         (right_neg / right) ** 2
+
+            gain = 1 - left / len(y) * gini_left - right / len(y) * gini_right
+
             if gain > best_gain:
                 best_gain = gain
                 best_idx = idx
 
-
         return best_idx, best_gain
-
+    
+    
     def split_data(self, X, y, idx, val):
         left_mask = X[:, idx] < val
         return (X[left_mask], y[left_mask]), (X[~left_mask], y[~left_mask])

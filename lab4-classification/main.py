@@ -14,7 +14,7 @@ def main():
     dt.evaluate(*train_data)
     dt.evaluate(*test_data)
 
-    rf = RandomForest({"ntrees": 50, "feature_subset": 4, "depth": 14})
+    rf = RandomForest({"ntrees": 20, "feature_subset": 4, "depth": 14})
     rf.train(*train_data)
     rf.evaluate(*train_data)
     rf.evaluate(*test_data)
