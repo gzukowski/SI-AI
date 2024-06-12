@@ -1,6 +1,7 @@
 import numpy as np
 from rl_base import Agent, Action, State
 import os
+import random
 
 
 class QAgent(Agent):
@@ -11,11 +12,11 @@ class QAgent(Agent):
 
         # hyperparams
         # TODO ustaw te parametry na sensowne wartości
-        self.lr = 0                # współczynnik uczenia (learning rate)
-        self.gamma = 0             # współczynnik dyskontowania
-        self.epsilon = 0           # epsilon (p-wo akcji losowej)
-        self.eps_decrement = 0     # wartość, o którą zmniejsza się epsilon po każdym kroku
-        self.eps_min = 0           # końcowa wartość epsilon, poniżej którego już nie jest zmniejszane
+        self.lr = 0.05               # współczynnik uczenia (learning rate)
+        self.gamma = 0.8             # współczynnik dyskontowania
+        self.epsilon = 1e-1           # epsilon (p-wo akcji losowej)
+        self.eps_decrement = 1e-4     # wartość, o którą zmniejsza się epsilon po każdym kroku
+        self.eps_min = 1e-3           # końcowa wartość epsilon, poniżej którego już nie jest zmniejszane
 
         self.action_space = [i for i in range(n_actions)]
         self.n_states = n_states
@@ -23,12 +24,16 @@ class QAgent(Agent):
 
     def init_q_table(self, initial_q_value=0.):
         # TODO - utwórz tablicę wartości Q o rozmiarze [n_states, n_actions] wypełnioną początkowo wartościami initial_q_value
-        q_table = None
-        return q_table
+        n_actions = len(self.action_space)
+        q_table = [[initial_q_value for _ in range(n_actions)] for _ in range(self.n_states)]
+        # print(self.n_states, n_actions)
+        # for row in q_table:
+        #     print(row)
+        return np.array(q_table)
 
     def update_action_policy(self) -> None:
         # TODO - zaktualizuj wartość epsilon
-        self.epsilon = self.epsilon
+        self.epsilon = max(self.epsilon - self.eps_decrement, self.eps_min)
 
     def choose_action(self, state: State) -> Action:
 
@@ -36,11 +41,19 @@ class QAgent(Agent):
             f"Bad state_idx. Has to be int between 0 and {self.n_states}"
 
         # TODO - zaimplementuj strategię eps-zachłanną
-        return Action(0)  # na razie agent zawsze wybiera akcję "idź do góry"
+        action = None
+        r = np.random.uniform(0, 1)
+        if r > self.epsilon:
+            action = np.argmax(self.q_table[state])
+        else:
+            action = random.choice(self.action_space)
+
+        return Action(action)
 
     def learn(self, state: State, action: Action, reward: float, new_state: State, done: bool) -> None:
         # TODO - zaktualizuj q_table
-        pass
+        delta = reward + self.gamma * np.max(self.q_table[new_state]) - self.q_table[state, action]
+        self.q_table[state][action] = self.q_table[state][action] + self.lr * delta
 
     def save(self, path):
         os.makedirs(os.path.dirname(path), exist_ok=True)
